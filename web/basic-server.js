@@ -1,6 +1,7 @@
 var http = require("http");
 var handler = require("./request-handler");
 var url = require("url");
+var fetcher = require("../workers/htmlfetcher.js");
 
 var port = 8080;
 var ip = "127.0.0.1";
@@ -13,7 +14,7 @@ var server = http.createServer(function(request, response) {
   } else if (parsedURL.pathname === '/search.js') {
     handler.handleRequest(request, response, '/search.js');
   } else if (parsedURL.pathname === '/domain') {
-    handler.handleDomains(request, response);
+    fetcher.handleDomains(request, response);
   } else {
     console.log('error');
   }

@@ -2,4 +2,6 @@ body {
   margin : 0px;
   font-family: arial, sans-serif;
   color: red;
+  background-color: black;
+  border: dashed;
 }

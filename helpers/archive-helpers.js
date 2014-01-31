@@ -1,6 +1,8 @@
 var fs = require('fs');
 var path = require('path');
 var archive = require('../helpers/archive-helpers');
+var http = require('http');
+var util = require('util');
 
 /* You will need to reuse the same paths many times over in the course of this sprint.
   Consider calling this function in `request-handler.js` and passing in the necessary
@@ -35,32 +37,70 @@ exports.readListOfUrls = function(res, searchData){
       return;
     }
     res.writeHead(200);
-    return(data);
+    archive.isUrlInList(res, searchData, data);
+    // return(data);
     //res.end(data);
   });
 
 };
 
-exports.isUrlInList = function(res, data){
-  //search data from readListOfUrls for whatever the user input was
-  //return true/false
-  console.log(data);
-  // var dataArray = data.split('/n');
-  // console.log(dataArray);
-  // res.end(data);
+exports.isUrlInList = function(res, data, file){
+  var dataArray = file.split('\n');
+  if (dataArray.indexOf("'" + data + "'") < 0) {
+    archive.addUrlToList(res, data);
+  } else {
+    res.end(data);
+  }
+
+
 };
 
-exports.addUrlToList = function(){
+exports.addUrlToList = function(res, data){
   //if not already in the list, writeFile 
-  fs.writeFile(archive.paths.list, 'utf8');
+  console.log('adding URL to list');
+  fs.appendFile(archive.paths.list, '\n' + data, function (err) {
+    if (err) {
+      throw err;
+    } else {
+      res.end(data);
+    }
+  });
+
 };
 
-exports.isURLArchived = function(){
+exports.isURLArchived = function(domain){
   //htmlfetcher checks this?
+  var filePath = exports.paths.archivedSites + '/' + domain;
+  fs.exists(filePath, function(exists) {
+    return util.debug(exists ? true : false);
+  });
+
 };
 
-exports.downloadUrls = function(){
+exports.downloadUrls = function(domain){
   //htmlfetcher does this
+  var options = {
+    host: domain,
+    port: 80,
+    path: '/',
+    method: 'GET'
+  };
+
+  var content = '';
+
+  http.get(options, function(res) {
+    res.on('data', function(chunk) {
+      content += chunk;
+    });
+
+    res.on('end', function() {
+      var path = exports.paths.archivedSites + '/' + domain;
+      fs.appendFile(path, content, function(err) {
+        if (err) throw err;
+        console.log('The "data to append" was appended to the file!');
+      });
+    });
+  });
 };
 
 // var readingList = readListOfUrls(res, searchData);

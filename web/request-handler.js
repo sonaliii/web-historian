@@ -14,17 +14,21 @@ exports.handleRequest = function (req, res, filename) {
 };
 
 exports.handleDomains = function(req, res) {
-  //check paths.list for the website name
-  //if it's not there, add it
-  //if it is there, do stuff or serve it
+
   var collected = '';
   var decoder = new StringDecoder('utf8');
   req.on("data", function (data) {
-    var searchData = decoder.write(data).search;
-    var readingList = archive.readListOfUrls(res, searchData);
-    console.log(readingList);
-    var checkingList = function() {archive.isUrlInList(readingList);};
-    checkingList();
+    var searchData = decoder.write(JSON.parse(data).search);
+    archive.readListOfUrls(res, searchData);
+    //archive.isUrlInList(res, searchData, listOfUrls);
+    //archive.addUrlToList(searchData);
+    archive.isURLArchived(searchData);
+    // archive.downloadUrls(searchData);
+
+    // var readingList = archive.readListOfUrls(res, searchData);
+    // console.log(readingList);
+    // var checkingList = function() {archive.isUrlInList(readingList);};
+    // checkingList();
   });
 
 };

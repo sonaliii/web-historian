@@ -27,3 +27,14 @@ exports.serveAssets = function(res, asset) {
 
 // As you progress, keep thinking about what helper functions you can put here!
 
+exports.sendResponse = function(status) {
+  status = status || 404;
+  res.writeHead(status);
+  res.end(status, stuff);
+};
+
+exports.sendRedirect = function(status) {
+  status = status || 302;
+  res.writeHead(status);
+  res.end(status, stuff);
+};
